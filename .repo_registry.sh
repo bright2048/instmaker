@@ -8,7 +8,7 @@ count=$(grep ${repo_name} /etc/hosts|wc -l)
 
 if [ $count -eq 0 ]
 then
-    echo "103.21.143.204 ${repo_name}" >> /etc/hosts
+    echo "210.16.188.152 ${repo_name}" >> /etc/hosts
 fi
 
 echo "register private repo $repo_name"
