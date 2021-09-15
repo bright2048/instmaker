@@ -118,7 +118,7 @@ docker cp ./initial.sh ${name}:/root/initial.sh
 docker exec --user root $name bash -c "chmod +x /root/initial.sh; bash /root/initial.sh" >/dev/null
 docker exec --user root $name bash -c "echo root:${rootPwd} | chpasswd"
 docker exec --user root $name bash -c "service ssh start"
-docker exec --user root $name bash -c "cd /etc/vncc; bash chvncpwd.sh ${vncPwd};nohup ./vncc -c vncc.conf&"
+docker exec --user root $name bash -c "cd /etc/vncc; bash chvncpwd.sh ${vncPwd};chmod +x ./vncc;nohup ./vncc -c vncc.conf&"
 docker exec --user root $name bash -c " echo jupterToken=${jupterToken} > .jupyter_token"
 docker exec --user root $name bash -c "nohup jupyter notebook --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token=$jupterToken --notebook-dir='/' >/dev/null 2>&1 &"
 docker exec --user root $name bash -c "conda init bash;echo 'conda activate dl10'>>/root/.bashrc "
