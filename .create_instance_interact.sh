@@ -113,8 +113,10 @@ else
 fi
 docker start $name
 docker exec --user root $name bash -c "mkdir /etc/vncc"
-docker cp vncc ${name}:/etc/vncc/
-docker cp vncc.conf ${name}:/etc/vncc/vncc.conf
+docker cp ./vncc ${name}:/etc/vncc/
+docker cp ./vncc.conf ${name}:/etc/vncc/vncc.conf
+docker cp ./initial.sh ${name}:/root/initial.sh
+docker exec --user root $name bash -c "chmod +x /root/initial.sh; bash /root/initial.sh" >/dev/null
 docker exec --user root $name bash -c "echo root:${rootPwd} | chpasswd"
 docker exec --user root $name bash -c "service ssh start"
 docker exec --user root $name bash -c "cd /etc/vncc; bash chvncpwd.sh ${vncPwd};nohup ./vncc -c vncc.conf&"
