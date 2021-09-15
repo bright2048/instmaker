@@ -40,7 +40,6 @@ done
 init_var
 
 
-imagename="registry.dbcloud.pro:8088/cuda11_conda_pure:v3.1"
 mkdir -p /remote-home/${ins_user}
 pdir="/remote-home/${ins_user}"
 vdir="/remote-home"
