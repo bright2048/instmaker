@@ -68,7 +68,7 @@ EOF
 }
 
 init_var
-init_file_create
+[ -f ./initial.sh ] && init_file_create
 
 sshp=`get_avail_port ${agentip}`
 jnp=`check_port $((sshp+1))`
