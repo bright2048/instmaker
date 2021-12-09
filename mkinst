@@ -6,6 +6,9 @@
 #
 
 source /root/instmaker/confenv
+mkdir -p /remote-home/
+pdir="/remote-home/"
+vdir="/remote-home"
 
 get_avail_port(){
     IP=$1
@@ -51,12 +54,21 @@ check_port(){
 done
 }
 
+
+init_file_create(){
+cat >initial.sh<<EOF
+#!/bin/bash
+echo root:${rootPwd} | chpasswd >/dev/null
+sed -i '/UsePAM yes/s/yes/no/g' /etc/ssh/sshd_config
+sed -i '/#PermitRootLogin/s/#PermitRootLogin/PermitRootLogin/g' /etc/ssh/sshd_config
+sed -i '/PermitRootLogin prohibit-password/s/prohibit-password/yes/g' /etc/ssh/sshd_config
+service ssh start
+cd /etc/vncc && nohup ./vncc -c vncc.conf &
+EOF
+}
+
 init_var
-
-
-mkdir -p /remote-home/
-pdir="/remote-home/"
-vdir="/remote-home"
+init_file_create
 
 sshp=`get_avail_port ${agentip}`
 jnp=`check_port $((sshp+1))`
@@ -129,7 +141,7 @@ docker exec --user root $name bash -c "mkdir -p /etc/vncc >/dev/null 2>&1"
 docker cp ./vncc ${name}:/etc/vncc/
 docker cp ./vncc.conf ${name}:/etc/vncc/vncc.conf
 docker cp ./initial.sh ${name}:/root/initial.sh
-docker exec --user root $name bash -c "chmod +x /root/initial.sh; bash /root/initial.sh" >/dev/null
+docker exec --user root $name bash -c "chmod +x /root/initial.sh; bash /root/initial.sh >/dev/null 2>&1" 
 docker exec --user root $name bash -c "echo root:${rootPwd} | chpasswd"
 docker exec --user root $name bash -c "service ssh start"
 docker exec --user root $name bash -c "cd /etc/vncc; bash chvncpwd.sh ${vncPwd};chmod +x ./vncc;nohup ./vncc -c vncc.conf >/dev/null &"
@@ -137,7 +149,7 @@ docker exec --user root $name bash -c " echo jupterToken=${jupterToken} > .jupyt
 docker exec --user root $name bash -c "nohup jupyter notebook --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token=$jupterToken --notebook-dir='/' >/dev/null 2>&1 &"
 docker exec --user root $name bash -c "conda init bash;echo 'conda activate dl10'>>/root/.bashrc "
 
-getServerID
+#getServerID
 inst_dir=$(echo "inst_info_${gpu_server}"|tr ":" "_")
 cd ~/
 test -d ${inst_dir} || mkdir -p ${inst_dir}
