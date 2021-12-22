@@ -1,0 +1,40 @@
+cat >/usr/local/bin/gpumonitor<<"EOF"
+#!/bin/bash
+res=""
+nvidia-smi -L >/dev/null
+if [ "$?" -ne 0 ]
+then
+    echo "[]"
+    exit 127
+fi
+GPUS=$(nvidia-smi -L|wc -l)
+GPUS=$(expr ${GPUS} - 1)
+#为了对齐列，这里多打了几个tab符
+echo -e "GID \t PID \t INS_name \t\t\t\t GPU_usage \t GMem_Total \t Mem_usage \t Pro_name \t"
+for i in $(seq 0 $GPUS)
+do
+    for PID in $(nvidia-smi pmon -i $i -c 1|grep -v ^#|awk '{print $2}')
+    do
+     if [ "$PID" != "-" ]
+     then
+      eval $(nvidia-smi pmon -i $i -c 1|tr - 0|grep -v ^#|awk '{if ($2 == '''$PID''') printf("gpuid=%s;pid=%s;gpu_usage=%s;pname=%s",$1,$2,$4,$8)}')
+      eval $(nvidia-smi pmon -i $i -s m -c 1|tr - 0|grep -v ^#|awk '{if ($2 == '''$PID''') printf("mem=%s",$4)}')
+      #为了解决报错： warning: command substitution: ignored null byte in input
+      #在后面接了管道，删除null byte字符：tr -d '\0'
+      tmp_name=$(grep -a -Po 'INS_NAME=\K.*' /proc/${PID}/environ |tr -d '\0')
+      [ $? -ne 0 ] && {
+          echo "no INS_NAME found in proc ${PID} env"
+          continue
+          }
+      ins_name=${tmp_name%%STY*}
+      total=$(nvidia-smi -q -i $i |grep -i "fb memory usage" -A1|awk -F: '{print $2}'|grep -v ^$|tr -d 'MiB'|tr -d ' ')
+      if [ $? -eq 0 ]
+      then
+        echo -e "$gpuid \t $pid \t $ins_name \t $gpu_usage \t\t ${total} \t\t ${mem} \t\t ${pname}"
+      fi
+    fi
+    done
+    echo -e "$(date +%F)\t $gpuid \t $pid \t $ins_name \t $gpu_usage \t ${total} \t ${mem} \t ${Pname}" >> result.txt
+done
+EOF
+chmod +x /usr/local/bin/gpumonitor
