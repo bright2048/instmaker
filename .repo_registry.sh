@@ -1,6 +1,6 @@
 #!/bin/bash
 
-repo_name="registry.dbcloud.pro"
+repo_name="registry.bright.pro"
 repo_port=8088
 repo_crt=domain.crt
 
