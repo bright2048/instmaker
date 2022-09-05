@@ -93,7 +93,7 @@ echo "ssh Port:"$sshp
 echo "vnc port:"$vncport
 echo "tensorbdPort:"$tensorbdPort
 
-cat >vncc.conf <<EOF
+cat >${workdir}/vncc.conf <<EOF
 [common]
 server_addr = ${agentip}
 server_port = ${server_port:-7000}
