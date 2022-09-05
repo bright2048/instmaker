@@ -27,7 +27,6 @@ init_var(){
     read -p "input your instance name: "  ins_user
     read -p "input the idle gpuid: " nvgpu
     rent_duration=${1-10}
-    agentip="103.21.143.204"
 
     if [[ -z ${ins_user} ]] || [[ -z ${rent_duration} ]] || [[ -z ${agentip} ]]
     then
