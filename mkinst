@@ -4,10 +4,10 @@
 #   210.16.188.193
 #   180.168.160.138
 #
-
+workdir="/root/instmaker"
 source /root/instmaker/confenv
 mkdir -p /remote-home/
-pdir="/remote-home/"
+pdir="/remote-home"
 vdir="/remote-home"
 
 get_avail_port(){
@@ -138,9 +138,9 @@ else
 fi
 docker start $name
 docker exec --user root $name bash -c "mkdir -p /etc/vncc >/dev/null 2>&1"
-docker cp ./vncc ${name}:/etc/vncc/
-docker cp ./vncc.conf ${name}:/etc/vncc/vncc.conf
-docker cp ./initial.sh ${name}:/root/initial.sh
+docker cp ${workdir}/vncc ${name}:/etc/vncc/
+docker cp ${workdir}/vncc.conf ${name}:/etc/vncc/vncc.conf
+docker cp ${workdir}/initial.sh ${name}:/root/initial.sh
 docker exec --user root $name bash -c "chmod +x /root/initial.sh; bash /root/initial.sh >/dev/null 2>&1" 
 docker exec --user root $name bash -c "echo root:${rootPwd} | chpasswd"
 docker exec --user root $name bash -c "service ssh start"
