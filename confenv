@@ -1,2 +1,2 @@
-imagename=docker.io/nvidia/cuda:10.2-runtime-ubuntu18.04
-agentip=103.21.143.204
+imagename=registry.bright.pro:8088/bright_torch17_cuda11_ubuntu20.04_new20220905:latest
+agentip=210.16.188.152
