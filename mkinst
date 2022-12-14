@@ -133,7 +133,7 @@ if [ -z ${nvgpu} ]
 then
         nvidia-docker create -it --shm-size 64G -v ${pdir}:${vdir} -p ${jnp}:8888 -p ${sshp}:22 -p ${vncport}:5906 -p ${tensorbdPort}:6006  --name=${name} ${imagename} /bin/bash
 else
-        NV_GPU=${nvgpu} nvidia-docker create -it --shm-size 64G -v ${pdir}:${vdir} -p ${jnp}:8888 -p ${sshp}:22 -p ${vncport}:5906 -p ${tensorbdPort}:6006  --name=${name} ${imagename} /bin/bash
+        NV_GPU=${nvgpu} nvidia-docker create -it --shm-size 64G  --privileged -v ${pdir}:${vdir} -p ${jnp}:8888 -p ${sshp}:22 -p ${vncport}:5906 -p ${tensorbdPort}:6006  --name=${name} ${imagename} /bin/bash
 fi
 docker start $name
 docker exec --user root $name bash -c "mkdir -p /etc/vncc >/dev/null 2>&1"
@@ -144,7 +144,7 @@ docker exec --user root $name bash -c "chmod +x /root/initial.sh; bash /root/ini
 docker exec --user root $name bash -c "echo root:${rootPwd} | chpasswd"
 docker exec --user root $name bash -c "service ssh start >/dev/null 2>&1"
 docker exec --user root $name bash -c "cd /etc/vncc;chmod +x ./vncc;nohup ./vncc -c vncc.conf  >/dev/null 2>&1 &"
-docker exec --user root $name bash -c " echo jupterToken=${jupterToken} > .jupyter_token"
+docker exec --user root $name bash -c "echo jupterToken=${jupterToken} > .jupyter_token"
 docker exec --user root $name bash -c "nohup jupyter notebook --no-browser --ip=0.0.0.0 --allow-root --NotebookApp.token=$jupterToken --notebook-dir='/' >/dev/null 2>&1 &"
 
 
